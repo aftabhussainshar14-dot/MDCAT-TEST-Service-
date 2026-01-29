@@ -1,0 +1,128 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MDCAT TEST Service</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;background:#f4f6f8;margin:0;padding:0}
+    .container{max-width:600px;margin:40px auto;background:#fff;padding:20px;border-radius:8px;box-shadow:0 4px 10px rgba(0,0,0,.1)}
+    h2{text-align:center}
+    .hidden{display:none}
+    .question{margin:15px 0}
+    button{padding:10px 16px;border:none;border-radius:5px;background:#007bff;color:#fff;cursor:pointer}
+    button:disabled{background:#999}
+    .timer{font-weight:bold;color:#d9534f;text-align:center}
+    input{width:100%;padding:8px;margin:6px 0}
+  </style>
+</head>
+<body>
+  <div class="container" id="accountBox">
+    <h2>MDCAT TEST Service<br>Account Details</h2>
+    <input type="text" id="name" placeholder="Full Name" />
+    <input type="text" id="account" value="EasyPaisa: 03458051059" readonly />
+    <button onclick="goToPayment()">Next</button>
+  </div>  <div class="container hidden" id="paymentBox">
+    <h2>Payment Verification</h2>
+    <p>Enter EasyPaisa Transaction ID</p>
+    <input type="text" id="txnId" placeholder="Transaction ID" />
+    <button onclick="verifyTransaction()">Verify & Start Test</button>
+  </div>  <div class="container hidden" id="testBox">
+    <h2>MDCAT TEST</h2>
+    <div class="timer">Time Left: <span id="time">120</span>timer</div><div class="question">
+
+
+<button onclick="submitTest()">Submit Test</button>
+
+  </div>  <div class="container hidden" id="resultBox">
+    <h2>Result</h2>
+    <p id="result"></p>
+  </div>  <!-- Admin Panel -->  <div class="container hidden" id="adminBox">
+    <h2>Admin Panel (Add MCQs)</h2>
+    <input type="password" id="adminPass" placeholder="Admin Password" />
+    <button onclick="loginAdmin()">Login</button><div id="adminArea" class="hidden">
+  <input type="text" id="qText" placeholder="Question" />
+  <input type="text" id="optA" placeholder="Option A" />
+  <input type="text" id="optB" placeholder="Option B" />
+  <input type="text" id="correct" placeholder="Correct Option (a/b)" />
+  <button onclick="addQuestion()">Add Question</button>
+</div>
+
+  </div><div class="container hidden" id="adminBox">
+  <h3>Admin Panel</h3>
+  <input type="password" id="adminPass" placeholder="Admin Password">
+  <button onclick="adminLogin()">Login</button>  <div id="adminArea" class="hidden">
+    <input type="text" id="aq" placeholder="Question">
+    <input type="text" id="oa" placeholder="Option A">
+    <input type="text" id="ob" placeholder="Option B">
+    <input type="text" id="ac" placeholder="Correct (a/b)">
+    <button onclick="addMCQ()">Add MCQ</button>
+  </div>
+</div><script>
+    let paid = false;
+    let timeLeft = 120;
+    let timer;
+
+    function goToPayment(){
+      document.getElementById('accountBox').classList.add('hidden');
+      document.getElementById('paymentBox').classList.remove('hidden');
+    }
+
+    function verifyTransaction(){
+      const tx = document.getElementById('txnId').value.trim();
+      if(tx.length < 6){
+        alert('Please enter valid Transaction ID');
+        return;
+      }
+      paid = true;
+      document.getElementById('paymentBox').classList.add('hidden');
+      document.getElementById('testBox').classList.remove('hidden');
+      loadQuestions();
+      startTimer();
+    }
+
+    function startTimer(){
+      timer = setInterval(()=>{
+        timeLeft--;
+        document.getElementById('time').innerText = timeLeft;
+        if(timeLeft <= 0){
+          clearInterval(timer);
+          submitTest();
+        }
+      },1000);
+    }
+
+    function submitTest(){
+      clearInterval(timer);
+      let score = 0;
+      if(document.querySelector('input[name="q1"]:checked')?.value === 'a') score++;
+      if(document.querySelector('input[name="q2"]:checked')?.value === 'b') score++;
+
+      document.getElementById('testBox').classList.add('hidden');
+      document.getElementById('resultBox').classList.remove('hidden');
+      document.getElementById('result').innerText = 'Your Score: ' + score + '/2';
+    }
+  
+// ADMIN + MCQ SYSTEM
+var questions = [];
+
+function adminLogin(){
+  if(document.getElementById("adminPass").value == "admin123"){
+    document.getElementById("adminArea").classList.remove("hidden");
+  }else{
+    alert("Wrong password");
+  }
+}
+
+function addMCQ(){
+  questions.push({
+    q: aq.value,
+    a: oa.value,
+    b: ob.value,
+    c: ac.value
+  });
+  alert("MCQ Added Successfully");
+  aq.value = oa.value = ob.value = ac.value = "";
+}
+
+</script></body>
+</html>
